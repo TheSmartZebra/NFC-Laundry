@@ -1,0 +1,21 @@
+name = "wcu-laundry"
+main = "src/index.js"
+compatibility_date = "2025-09-23"
+
+# Static assets (CSS) are served straight from ./public; anything that does not
+# match a file there falls through to the Worker in src/index.js.
+[assets]
+directory = "./public"
+
+[vars]
+# Unguessable admin path. Change this to rotate the admin URL (see README).
+ADMIN_PATH = "svc-49cf11a9c6ecd31dfba6a0c8"
+
+# Replace `id` with the KV namespace id printed by:
+#   npx wrangler kv namespace create LAUNDRY
+[[kv_namespaces]]
+binding = "LAUNDRY"
+id = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
+
+# ADMIN_PASSWORD is a Worker secret, never a var:
+#   npx wrangler secret put ADMIN_PASSWORD

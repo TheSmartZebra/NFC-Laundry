@@ -1,0 +1,354 @@
+/* Western Carolina University — Residential Laundry Status
+   Brand: deep purple #492A76, gold #FDB515 */
+
+:root {
+  --wcu-purple: #492a76;
+  --wcu-purple-dark: #351f58;
+  --wcu-purple-light: #6b47a0;
+  --wcu-gold: #fdb515;
+  --wcu-gold-dark: #c98c00;
+  --ink: #23212b;
+  --ink-soft: #5a5666;
+  --rule: #ddd9e4;
+  --page: #f4f2f7;
+  --surface: #ffffff;
+  --busy: #9b2226;
+  --busy-bg: #fbeced;
+  --free: #1f6f3f;
+  --free-bg: #e9f5ee;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  margin: 0;
+  background: var(--page);
+  color: var(--ink);
+  font-family: "Georgia", "Times New Roman", serif;
+  font-size: 17px;
+  line-height: 1.55;
+}
+
+.wrap {
+  width: 100%;
+  max-width: 62rem;
+  margin: 0 auto;
+  padding: 0 1.1rem;
+}
+
+/* ---------- header ---------- */
+
+.site-header {
+  background: var(--wcu-purple);
+  border-bottom: 5px solid var(--wcu-gold);
+  color: #fff;
+}
+
+.header-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem 1rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.wordmark {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  color: #fff;
+  text-decoration: none;
+}
+
+.wordmark-mark {
+  font-family: "Georgia", serif;
+  font-size: 1.9rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--wcu-gold);
+}
+
+.wordmark-text {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 0.82rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.unit {
+  margin: 0;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.subnav {
+  background: var(--wcu-purple-dark);
+  color: #fff;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.subnav .wrap { padding-top: 0.6rem; padding-bottom: 0.6rem; }
+
+/* ---------- content ---------- */
+
+main.wrap { flex: 1 0 auto; padding-top: 1.6rem; padding-bottom: 2.5rem; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-top: 4px solid var(--wcu-purple);
+  border-radius: 3px;
+  padding: 1.5rem 1.4rem;
+  margin-bottom: 1.1rem;
+  box-shadow: 0 1px 2px rgba(35, 33, 43, 0.06);
+}
+
+.card-started { border-top-color: var(--wcu-gold); }
+.card-busy { border-top-color: var(--busy); }
+.card-confirm { border-top-color: var(--wcu-gold); }
+.card-secondary { border-top-width: 1px; border-top-color: var(--rule); }
+
+h1 {
+  margin: 0.2rem 0 0.6rem;
+  font-size: 1.85rem;
+  line-height: 1.2;
+  color: var(--wcu-purple);
+}
+
+h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.15rem;
+  color: var(--wcu-purple);
+}
+
+.headline {
+  margin: 0 0 0.35rem;
+  font-size: 1.22rem;
+}
+
+.headline strong { color: var(--wcu-purple); white-space: nowrap; }
+
+.countdown {
+  margin: 0 0 1rem;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+}
+
+.note, .rescan {
+  margin: 0.9rem 0 0;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 0.93rem;
+  color: var(--ink-soft);
+}
+
+.rescan { text-align: center; }
+
+.fine {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+}
+
+.plain-list { margin: 0; padding-left: 1.1rem; }
+
+/* ---------- status pills ---------- */
+
+.status-pill {
+  display: inline-block;
+  margin: 0 0 0.5rem;
+  padding: 0.22rem 0.62rem;
+  border-radius: 2px;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.pill-busy { background: var(--busy-bg); color: var(--busy); }
+.pill-started { background: #fff4d6; color: #7a5200; }
+.pill-free { background: var(--free-bg); color: var(--free); }
+
+/* ---------- buttons & forms ---------- */
+
+.btn {
+  display: inline-block;
+  margin-top: 0.7rem;
+  padding: 0.72rem 1.15rem;
+  border: 2px solid transparent;
+  border-radius: 3px;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn-primary { background: var(--wcu-purple); color: #fff; }
+.btn-primary:hover { background: var(--wcu-purple-dark); }
+
+.btn-outline {
+  background: #fff;
+  border-color: var(--wcu-purple);
+  color: var(--wcu-purple);
+}
+.btn-outline:hover { background: #f1ecf8; }
+
+.btn-quiet {
+  background: transparent;
+  color: var(--ink-soft);
+  text-decoration: underline;
+}
+
+.btn-small { padding: 0.4rem 0.7rem; font-size: 0.82rem; margin-top: 0; }
+.btn-small:not(.btn-outline) { background: var(--wcu-gold); color: #3a2a00; }
+.btn-small:not(.btn-outline):hover { background: var(--wcu-gold-dark); color: #fff; }
+.btn[disabled] { opacity: 0.4; cursor: not-allowed; }
+
+.card-confirm .btn, .card-login .btn { display: block; width: 100%; }
+
+label {
+  display: block;
+  margin-top: 0.8rem;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+input[type="password"], input[type="number"] {
+  width: 100%;
+  margin-top: 0.3rem;
+  padding: 0.65rem 0.7rem;
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  font: inherit;
+  font-size: 1rem;
+}
+
+input:focus-visible, .btn:focus-visible, a:focus-visible {
+  outline: 3px solid var(--wcu-gold);
+  outline-offset: 2px;
+}
+
+.duration-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.8rem;
+}
+
+.duration-form .field { flex: 1 1 9rem; }
+.duration-form .field label { margin-top: 0; }
+.duration-form .btn { margin-top: 0; }
+
+.logout { margin-top: 1.2rem; }
+
+/* ---------- alerts ---------- */
+
+.alert {
+  margin: 0 0 1rem;
+  padding: 0.7rem 0.9rem;
+  border-left: 4px solid;
+  border-radius: 2px;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 0.92rem;
+}
+
+.alert-error { background: var(--busy-bg); border-color: var(--busy); color: var(--busy); }
+.alert-ok { background: var(--free-bg); border-color: var(--free); color: var(--free); }
+
+/* ---------- admin table ---------- */
+
+.dash-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.3rem 1rem;
+}
+
+.dash-head h1 { margin-bottom: 0.6rem; }
+
+.summary {
+  margin: 0 0 0.6rem;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+}
+
+.table-scroll { overflow-x: auto; }
+
+.status-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 0.92rem;
+}
+
+.status-table th, .status-table td {
+  padding: 0.6rem 0.7rem;
+  border-bottom: 1px solid var(--rule);
+  text-align: left;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.status-table thead th {
+  background: var(--wcu-purple);
+  color: #fff;
+  font-size: 0.74rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.status-table tbody th { color: var(--wcu-purple); }
+.status-table .row-busy { background: #fdf7f7; }
+.status-table .status-pill { margin: 0; }
+.status-table .actions form { display: flex; gap: 0.4rem; }
+
+/* ---------- footer ---------- */
+
+.site-footer {
+  flex-shrink: 0;
+  margin-top: 1rem;
+  padding: 1.4rem 0 2rem;
+  background: var(--wcu-purple);
+  border-top: 5px solid var(--wcu-gold);
+  color: rgba(255, 255, 255, 0.88);
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 0.85rem;
+}
+
+.site-footer p { margin: 0 0 0.35rem; }
+.site-footer .fine { color: rgba(255, 255, 255, 0.7); }
+
+/* ---------- small screens ---------- */
+
+@media (max-width: 34rem) {
+  body { font-size: 16px; }
+  h1 { font-size: 1.55rem; }
+  .headline { font-size: 1.12rem; }
+  .card { padding: 1.2rem 1rem; }
+  .wordmark-text { font-size: 0.7rem; }
+  .unit { flex-basis: 100%; }
+  .duration-form .field { flex-basis: 100%; }
+  .duration-form .btn { width: 100%; }
+}

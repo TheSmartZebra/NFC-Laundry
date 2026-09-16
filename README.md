@@ -9,6 +9,8 @@ Tapping the tag starts a cycle; anyone else who taps it sees when the machine wi
 - No accounts, no login, no app to install on the public pages
 - No cron job: a busy machine becomes available lazily, the next time its status is read
 
+**Live:** <https://wcu-laundry.wculaundry.workers.dev>
+
 ### Setup checklist
 
 Each step is detailed below.
@@ -28,10 +30,10 @@ Each step is detailed below.
 Each machine's tag should point at:
 
 ```
-https://<your-worker-domain>/m/washer-1
-https://<your-worker-domain>/m/washer-2
+https://wcu-laundry.wculaundry.workers.dev/m/washer-1
+https://wcu-laundry.wculaundry.workers.dev/m/washer-2
 ...
-https://<your-worker-domain>/m/dryer-6
+https://wcu-laundry.wculaundry.workers.dev/m/dryer-6
 ```
 
 What happens on a tap:
@@ -117,7 +119,7 @@ The admin page lives at an unguessable, randomly generated path — whatever you
 in step 2.3:
 
 ```
-https://<your-worker-domain>/<your-ADMIN_PATH>/
+https://wcu-laundry.wculaundry.workers.dev/<your-ADMIN_PATH>/
 ```
 
 It is not linked from any public page, is excluded from crawlers via `noindex, nofollow`, and there

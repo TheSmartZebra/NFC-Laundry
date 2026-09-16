@@ -18,7 +18,7 @@ export function minutesLeft(busyUntil, now = Date.now()) {
   return Math.max(0, Math.ceil((busyUntil - now) / 60_000));
 }
 
-export function layout({ title, eyebrow, body, admin = false }) {
+export function layout({ title, eyebrow, body, admin = false, script = '' }) {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -49,6 +49,7 @@ ${body}
     <p class="fine">Laundry status is reported by residents tapping the tag on each machine. Times are estimates and are shown in Eastern Time.</p>
   </div>
 </footer>
+${script}
 </body>
 </html>`;
 }
@@ -78,7 +79,7 @@ export function startedPage(machine) {
   <p class="note">Thanks &mdash; this machine now shows as in use for everyone else. Please collect your laundry promptly so the next resident can start.</p>
 </div>
 <p class="rescan">Tap the tag on this machine again at any time to check its status.</p>`;
-  return layout({ title: label, eyebrow: `${escapeHtml(label)} — Cycle started`, body });
+  return layout({ title: label, eyebrow: `${escapeHtml(label)} — Cycle started`, body, script: countdownScript() });
 }
 
 // Shown when someone scans a machine that is already running.
@@ -97,7 +98,7 @@ export function busyPage(machine) {
   <p>If the machine is empty and sitting idle, the status may be out of date &mdash; a duplicate tap or a bumped tag can leave it marked in use.</p>
   <a class="btn btn-outline" href="/m/${encodeURIComponent(machine.slug)}?free=1">This machine is actually free</a>
 </div>`;
-  return layout({ title: label, eyebrow: `${escapeHtml(label)} — In use`, body });
+  return layout({ title: label, eyebrow: `${escapeHtml(label)} — In use`, body, script: countdownScript() });
 }
 
 // Lightweight confirm step before overriding a busy machine.
@@ -116,22 +117,71 @@ export function confirmFreePage(machine) {
   return layout({ title: label, eyebrow: `${escapeHtml(label)} — Confirm`, body });
 }
 
-export function landingPage(durations) {
+export function landingPage(durations, machines, now = Date.now()) {
+  const washers = machines.filter((m) => m.type === 'washer');
+  const dryers = machines.filter((m) => m.type === 'dryer');
+  const freeWashers = washers.filter((m) => m.status === 'available').length;
+  const freeDryers = dryers.filter((m) => m.status === 'available').length;
+
   const body = `
-<div class="card">
-  <h1>Residential Laundry Status</h1>
-  <p class="headline">Tap the tag on a machine to start or check a cycle.</p>
-  <p class="note">Each washer and dryer in the laundry room has its own tag and QR code. Tapping it with your phone marks the machine in use and shows everyone else when it will be free again. There is nothing to install and no login.</p>
+<div class="card card-board">
+  <div class="dash-head">
+    <h1>Laundry Status</h1>
+    <p class="updated">Updated ${formatTime(now)} &middot; <a href="/">refresh</a></p>
+  </div>
+
+  <div class="tallies">
+    <p class="tally"><strong>${freeWashers}</strong> of ${washers.length} washers free</p>
+    <p class="tally"><strong>${freeDryers}</strong> of ${dryers.length} dryers free</p>
+  </div>
+
+  <h2 class="group-heading">Washers</h2>
+  <div class="tiles">${washers.map((m) => tile(m, now)).join('')}</div>
+
+  <h2 class="group-heading">Dryers</h2>
+  <div class="tiles">${dryers.map((m) => tile(m, now)).join('')}</div>
+
+  <p class="fine board-note">Status comes from residents tapping the tag on each machine, so it can
+  be wrong if someone forgets. To start a cycle, tap the tag on the machine itself &mdash; there is
+  nothing to start from this page.</p>
 </div>
+
 <div class="card card-secondary">
   <h2>Standard cycle times</h2>
   <ul class="plain-list">
     <li><strong>Washers</strong> &mdash; ${durations.washer} minutes</li>
     <li><strong>Dryers</strong> &mdash; ${durations.dryer} minutes</li>
   </ul>
-  <p class="fine">A short grace period is added to each cycle so there is time to unload.</p>
+  <p class="fine">A ${durations.buffer}-minute grace period is added to each cycle so there is time to unload.</p>
 </div>`;
-  return layout({ title: 'Laundry Status', eyebrow: 'Residential Laundry Status', body });
+
+  return layout({
+    title: 'Laundry Status',
+    eyebrow: 'Residential Laundry Status',
+    body,
+    script: countdownScript({ reloadSeconds: 60 }),
+  });
+}
+
+// One machine on the status board. Deliberately not a link: visiting a machine
+// URL starts a cycle, so the board reports status and nothing more.
+function tile(machine, now) {
+  const label = escapeHtml(machineLabel(machine.slug));
+  if (machine.status !== 'busy') {
+    return `
+    <div class="tile tile-free">
+      <p class="tile-name">${label}</p>
+      <p class="tile-state">Available</p>
+    </div>`;
+  }
+  const left = minutesLeft(machine.busyUntil, now);
+  return `
+    <div class="tile tile-busy">
+      <p class="tile-name">${label}</p>
+      <p class="tile-state">In use</p>
+      <p class="tile-until">free at ${formatTime(machine.busyUntil)}</p>
+      <p class="tile-left" data-until="${machine.busyUntil}" data-format="short">${left} min</p>
+    </div>`;
 }
 
 export function notFoundPage() {
@@ -147,23 +197,36 @@ export function notFoundPage() {
 
 function countdown(busyUntil) {
   const left = minutesLeft(busyUntil);
-  return `<p class="countdown" data-until="${busyUntil}">about ${left} ${left === 1 ? 'minute' : 'minutes'} remaining</p>
-<script>
+  return `<p class="countdown" data-until="${busyUntil}" data-format="long">about ${left} ${left === 1 ? 'minute' : 'minutes'} remaining</p>`;
+}
+
+// Drives every [data-until] element on the page, so one copy serves both the
+// single-machine countdown and the many tiles on the status board.
+function countdownScript({ reloadSeconds = 0 } = {}) {
+  return `<script>
 (function () {
-  var el = document.querySelector('.countdown');
-  if (!el) return;
-  var until = Number(el.dataset.until);
+  var nodes = document.querySelectorAll('[data-until]');
+  if (!nodes.length) return;
+
   function tick() {
-    var left = Math.max(0, Math.ceil((until - Date.now()) / 60000));
-    if (left <= 0) {
-      el.textContent = 'This machine should be free now — reload to confirm.';
-      clearInterval(timer);
-      return;
-    }
-    el.textContent = 'about ' + left + (left === 1 ? ' minute remaining' : ' minutes remaining');
+    var stale = false;
+    nodes.forEach(function (el) {
+      var left = Math.max(0, Math.ceil((Number(el.dataset.until) - Date.now()) / 60000));
+      if (el.dataset.format === 'short') {
+        el.textContent = left > 0 ? left + ' min' : 'any moment';
+      } else if (left > 0) {
+        el.textContent = 'about ' + left + (left === 1 ? ' minute remaining' : ' minutes remaining');
+      } else {
+        el.textContent = 'This machine should be free now — reload to confirm.';
+      }
+      if (left <= 0) stale = true;
+    });
+    if (stale) clearInterval(timer);
   }
+
   var timer = setInterval(tick, 15000);
   tick();
+  ${reloadSeconds ? `setTimeout(function () { location.reload(); }, ${reloadSeconds * 1000});` : ''}
 })();
 </script>`;
 }

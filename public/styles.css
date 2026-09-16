@@ -183,6 +183,93 @@ h2 {
 .pill-started { background: #fff4d6; color: #7a5200; }
 .pill-free { background: var(--free-bg); color: var(--free); }
 
+
+/* ---------- status board ---------- */
+
+.card-board { border-top-color: var(--wcu-gold); }
+
+.updated {
+  margin: 0 0 0.6rem;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+}
+
+.updated a { color: var(--wcu-purple); }
+
+.tallies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.1rem;
+}
+
+.tally {
+  flex: 1 1 10rem;
+  margin: 0;
+  padding: 0.6rem 0.8rem;
+  background: var(--page);
+  border-left: 4px solid var(--wcu-gold);
+  border-radius: 2px;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+}
+
+.tally strong { font-size: 1.3rem; color: var(--wcu-purple); }
+
+.group-heading {
+  margin: 1.2rem 0 0.5rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 2px solid var(--rule);
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 0.76rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+  gap: 0.5rem;
+}
+
+.tile {
+  padding: 0.65rem 0.7rem;
+  border: 1px solid var(--rule);
+  border-left: 4px solid;
+  border-radius: 3px;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+}
+
+.tile-free { border-left-color: var(--free); background: var(--free-bg); }
+.tile-busy { border-left-color: var(--busy); background: var(--busy-bg); }
+
+.tile p { margin: 0; }
+
+.tile-name {
+  font-family: Georgia, serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--wcu-purple);
+}
+
+.tile-state {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  margin-top: 0.15rem !important;
+}
+
+.tile-free .tile-state { color: var(--free); }
+.tile-busy .tile-state { color: var(--busy); }
+
+.tile-until { font-size: 0.78rem; color: var(--ink-soft); margin-top: 0.25rem !important; }
+.tile-left { font-size: 0.78rem; font-weight: 700; color: var(--ink); }
+
+.board-note { display: block; margin-top: 1.2rem; }
+
 /* ---------- buttons & forms ---------- */
 
 .btn {
@@ -344,6 +431,8 @@ input:focus-visible, .btn:focus-visible, a:focus-visible {
 
 @media (max-width: 34rem) {
   body { font-size: 16px; }
+  .tiles { grid-template-columns: repeat(2, 1fr); }
+  .tally { flex-basis: 100%; }
   h1 { font-size: 1.55rem; }
   .headline { font-size: 1.12rem; }
   .card { padding: 1.2rem 1rem; }

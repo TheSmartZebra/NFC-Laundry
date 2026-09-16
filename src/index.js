@@ -1,5 +1,5 @@
 import { handleAdmin } from './admin.js';
-import { getDurations, getMachine, parseSlug, startCycle } from './store.js';
+import { getDurations, getMachine, listMachines, parseSlug, startCycle } from './store.js';
 import {
   busyPage, confirmFreePage, htmlResponse, landingPage, notFoundPage, startedPage,
 } from './views.js';
@@ -9,7 +9,11 @@ export default {
     const url = new URL(request.url);
     const segments = url.pathname.split('/').filter(Boolean);
 
-    if (segments.length === 0) return htmlResponse(landingPage(await getDurations(env)));
+    if (segments.length === 0) {
+      const now = Date.now();
+      const [durations, machines] = await Promise.all([getDurations(env), listMachines(env, now)]);
+      return htmlResponse(landingPage(durations, machines, now));
+    }
 
     if (env.ADMIN_PATH && segments[0] === env.ADMIN_PATH) {
       return handleAdmin(request, env, segments.slice(1).join('/'), url);

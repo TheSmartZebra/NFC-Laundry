@@ -4,6 +4,9 @@
   "private": true,
   "description": "WCU Housing & Residence Life laundry machine status tracker (Cloudflare Workers + KV)",
   "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy"

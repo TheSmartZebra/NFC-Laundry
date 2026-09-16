@@ -1,0 +1,4 @@
+# Copy to .dev.vars for local `npm run dev`. .dev.vars is gitignored — never commit it.
+# Production values are set with `npx wrangler secret put <NAME>`, not here.
+ADMIN_PATH=svc-localdevonly
+ADMIN_PASSWORD=localdevpassword

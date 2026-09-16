@@ -60,23 +60,32 @@ binding = "LAUNDRY"
 id = "a1b2c3..."          # <- the id from the command above
 ```
 
-### 2.3 Admin password
+### 2.3 Admin secrets
 
-The admin password is a Worker secret. It is never committed to the repo and never appears in
-`wrangler.toml`.
+The admin URL and password are both Worker **secrets**. Neither is committed — this is a public
+repo, and a `[vars]` entry in `wrangler.toml` would publish the admin URL to anyone who looks.
+Secrets are stored encrypted by Cloudflare and survive redeploys.
+
+Generate the two values:
 
 ```bash
+node -e "console.log('ADMIN_PATH     svc-'+require('crypto').randomBytes(12).toString('hex'))"
+node -e "console.log('ADMIN_PASSWORD '+require('crypto').randomBytes(18).toString('base64url'))"
+```
+
+Save both somewhere safe (a password manager), then set them:
+
+```bash
+npx wrangler secret put ADMIN_PATH
 npx wrangler secret put ADMIN_PASSWORD
 ```
 
-Paste a long random password when prompted. To generate one:
+Notes:
 
-```bash
-node -e "console.log(require('crypto').randomBytes(18).toString('base64url'))"
-```
-
-Changing the password invalidates every existing admin session, because session cookies are signed
-with it.
+- If `ADMIN_PATH` is not set, the admin page does not exist at all — every URL 404s. That is the
+  safe default, not a bug.
+- Changing `ADMIN_PASSWORD` invalidates every existing admin session, because session cookies are
+  signed with it.
 
 ### 2.4 First deploy
 
@@ -92,14 +101,17 @@ but it gives you a clean, complete starting state.
 
 ## 3. Admin page
 
-The admin page lives at an unguessable, randomly generated path. For this repo it is:
+The admin page lives at an unguessable, randomly generated path — whatever you set `ADMIN_PATH` to
+in step 2.3:
 
 ```
-https://<your-worker-domain>/svc-49cf11a9c6ecd31dfba6a0c8/
+https://<your-worker-domain>/<your-ADMIN_PATH>/
 ```
 
 It is not linked from any public page, is excluded from crawlers via `noindex, nofollow`, and there
-is no sitemap.
+is no sitemap. The path is deliberately not recorded anywhere in this repo; if you lose it, read it
+back from the Cloudflare dashboard (Workers & Pages → wcu-laundry → Settings → Variables) or just
+set a new one.
 
 **Sign in** with the `ADMIN_PASSWORD` secret. On success the Worker sets an `HttpOnly; Secure;
 SameSite=Strict` cookie holding an expiry plus an HMAC of that expiry keyed by the password — the
@@ -113,13 +125,14 @@ From the dashboard you can:
   so the change is live with no redeploy)
 - **Initialize all 12 machine records** — writes a fresh `available` record for every machine
 
-### Changing the admin URL
-
-Edit `ADMIN_PATH` in `wrangler.toml` and redeploy. Generate a new one with:
+### Rotating the admin URL
 
 ```bash
 node -e "console.log('svc-'+require('crypto').randomBytes(12).toString('hex'))"
+npx wrangler secret put ADMIN_PATH
 ```
+
+Takes effect immediately, no redeploy needed.
 
 ---
 
@@ -133,7 +146,8 @@ secrets (**Settings → Secrets and variables → Actions → New repository sec
 | `CLOUDFLARE_API_TOKEN` | Cloudflare dashboard → My Profile → API Tokens → Create Token → **Edit Cloudflare Workers** template |
 | `CLOUDFLARE_ACCOUNT_ID` | Cloudflare dashboard → Workers & Pages → Overview (right-hand sidebar), or `npx wrangler whoami` |
 
-`ADMIN_PASSWORD` is **not** a GitHub secret — it lives only in Cloudflare and survives redeploys.
+`ADMIN_PATH` and `ADMIN_PASSWORD` are **not** GitHub secrets — they live only in Cloudflare and
+survive redeploys. GitHub Actions never needs to see them.
 
 ---
 
@@ -144,11 +158,13 @@ npm run dev
 ```
 
 `wrangler dev` uses a local KV simulation, so you can tap through the flows without touching
-production data. To test the admin page locally, create a `.dev.vars` file (already gitignored):
+production data. For the admin page locally, copy the example file:
 
+```bash
+cp .dev.vars.example .dev.vars
 ```
-ADMIN_PASSWORD=localdevpassword
-```
+
+`.dev.vars` is gitignored. Use throwaway values there — it is not where production secrets live.
 
 ---
 
@@ -160,7 +176,7 @@ src/store.js      KV state — machine records, lazy expiry, durations
 src/views.js      Public HTML (WCU-styled layout, start/busy/confirm pages)
 src/admin.js      Admin auth, dashboard and actions
 public/styles.css Static stylesheet, served directly from ./public
-wrangler.toml     Worker config, KV binding, ADMIN_PATH
+wrangler.toml     Worker config, KV binding (no secrets)
 .github/workflows/deploy.yml
 ```
 

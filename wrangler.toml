@@ -7,15 +7,14 @@ compatibility_date = "2025-09-23"
 [assets]
 directory = "./public"
 
-[vars]
-# Unguessable admin path. Change this to rotate the admin URL (see README).
-ADMIN_PATH = "svc-49cf11a9c6ecd31dfba6a0c8"
-
 # Replace `id` with the KV namespace id printed by:
 #   npx wrangler kv namespace create LAUNDRY
 [[kv_namespaces]]
 binding = "LAUNDRY"
 id = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
 
-# ADMIN_PASSWORD is a Worker secret, never a var:
+# Both admin settings are Worker secrets, never committed vars. Secrets survive
+# redeploys; a [vars] block would publish the admin URL in this public repo.
+#   npx wrangler secret put ADMIN_PATH        # e.g. svc-<random hex>
 #   npx wrangler secret put ADMIN_PASSWORD
+# Without ADMIN_PATH set, the admin page simply does not exist (404).

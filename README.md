@@ -9,6 +9,18 @@ Tapping the tag starts a cycle; anyone else who taps it sees when the machine wi
 - No accounts, no login, no app to install on the public pages
 - No cron job: a busy machine becomes available lazily, the next time its status is read
 
+### Setup checklist
+
+Each step is detailed below.
+
+- [ ] `npm install`, then `npx wrangler login`  (§2.1)
+- [ ] Create the KV namespace, paste its id into `wrangler.toml`  (§2.2)
+- [ ] Set the `ADMIN_PATH` and `ADMIN_PASSWORD` secrets  (§2.3)
+- [ ] `npx wrangler deploy`, note the URL it prints  (§2.4)
+- [ ] Open the admin page, press **Initialize all 12 machine records**  (§3)
+- [ ] Add the two GitHub repo secrets so pushes auto-deploy  (§4)
+- [ ] Generate and print the QR tags, write the NFC stickers  (§5)
+
 ---
 
 ## 1. Machine links
@@ -151,7 +163,24 @@ survive redeploys. GitHub Actions never needs to see them.
 
 ---
 
-## 5. Local development
+## 5. QR codes and NFC tags
+
+Open `tools/tags.html` in any browser (double-click it — no server needed), paste the URL from
+`wrangler deploy`, and press **Generate**. You get:
+
+- A printable sheet of 12 QR cards, one per machine, cut lines included
+- The 12 URLs in a table, ready to write to NFC stickers
+
+Everything runs locally in the page; nothing is uploaded. It pulls a QR library from cdnjs, so you
+need a connection the first time you use it.
+
+For the NFC stickers: NTAG213 or better, any writer app (NFC Tools is fine), write each machine's
+URL as a **URL/URI record**, then lock the tag read-only so nobody can rewrite it. Put the printed
+QR card beside the sticker — it covers phones without NFC and people who would rather scan.
+
+---
+
+## 6. Local development
 
 ```bash
 npm run dev
@@ -168,7 +197,7 @@ cp .dev.vars.example .dev.vars
 
 ---
 
-## 6. Repo layout
+## 7. Repo layout
 
 ```
 src/index.js      Router: machine pages, admin routes, 404
@@ -176,6 +205,7 @@ src/store.js      KV state — machine records, lazy expiry, durations
 src/views.js      Public HTML (WCU-styled layout, start/busy/confirm pages)
 src/admin.js      Admin auth, dashboard and actions
 public/styles.css Static stylesheet, served directly from ./public
+tools/tags.html   Offline QR tag sheet + NFC URL list generator
 wrangler.toml     Worker config, KV binding (no secrets)
 .github/workflows/deploy.yml
 ```
@@ -201,7 +231,7 @@ has passed, the record is flipped to `available` and written back before any oth
 
 ---
 
-## 7. Known limitations
+## 8. Known limitations
 
 - **Trust-based.** Anyone with the link can start or free a machine. That is the intended trade-off
   for a no-login dorm utility.

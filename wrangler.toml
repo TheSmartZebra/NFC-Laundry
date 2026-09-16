@@ -7,11 +7,10 @@ compatibility_date = "2025-09-23"
 [assets]
 directory = "./public"
 
-# Replace `id` with the KV namespace id printed by:
-#   npx wrangler kv namespace create LAUNDRY
+# Created with `npx wrangler kv namespace create LAUNDRY`. Not a secret.
 [[kv_namespaces]]
 binding = "LAUNDRY"
-id = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
+id = "99714abca9c04010af6d6003056b3767"
 
 # Both admin settings are Worker secrets, never committed vars. Secrets survive
 # redeploys; a [vars] block would publish the admin URL in this public repo.
